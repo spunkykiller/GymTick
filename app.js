@@ -371,7 +371,11 @@ function updateProgress() {
 
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
-    document.getElementById('complete-btn').addEventListener('click', handleCompleteWorkout);
+    // Complete Workout Button
+    const completeBtn = document.getElementById('complete-btn'); // Changed from 'complete-workout-btn' to 'complete-btn' to match existing ID
+    if (completeBtn) {
+        completeBtn.onclick = handleCompleteWorkout;
+    }
 
     // Tech Feature: Data Portability
     const exportBtn = document.getElementById('export-btn');
