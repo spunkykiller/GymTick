@@ -5,7 +5,9 @@ const timerState = {
     duration: 90, // Default 90 seconds
     remaining: 0,
     interval: null,
-    isActive: false
+    isActive: false,
+    isPaused: false,
+    pausedAt: null
 };
 
 function initTimer() {
@@ -26,7 +28,26 @@ function initTimer() {
 
     document.getElementById('timer-subtract').onclick = () => adjustTimer(-15);
     document.getElementById('timer-add').onclick = () => adjustTimer(15);
-    document.getElementById('timer-toggle').onclick = stopTimer;
+    document.getElementById('timer-toggle').onclick = () => {
+        if (timerState.isPaused) {
+            resumeTimer();
+        } else {
+            stopTimer();
+        }
+    };
+
+    // Auto-pause when page becomes hidden (user switches apps)
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+}
+
+function handleVisibilityChange() {
+    if (document.hidden && timerState.isActive && !timerState.isPaused) {
+        // Page hidden - auto-pause
+        pauseTimer();
+    } else if (!document.hidden && timerState.isPaused) {
+        // Page visible again - auto-resume
+        resumeTimer();
+    }
 }
 
 function startTimer(seconds = 90) {
@@ -34,26 +55,46 @@ function startTimer(seconds = 90) {
 
     timerState.remaining = seconds;
     timerState.isActive = true;
+    timerState.isPaused = false;
 
     updateTimerDisplay();
     document.getElementById('rest-timer-overlay').classList.remove('hidden');
 
     timerState.interval = setInterval(() => {
-        timerState.remaining--;
-        updateTimerDisplay();
+        if (!timerState.isPaused) {
+            timerState.remaining--;
+            updateTimerDisplay();
 
-        if (timerState.remaining <= 0) {
-            stopTimer();
-            notifyTimerEnd();
+            if (timerState.remaining <= 0) {
+                stopTimer();
+                notifyTimerEnd();
+            }
         }
     }, 1000);
+}
+
+function pauseTimer() {
+    timerState.isPaused = true;
+    timerState.pausedAt = Date.now();
+    document.getElementById('timer-toggle').textContent = 'RESUME';
+    document.querySelector('.timer-label').textContent = 'PAUSED';
+}
+
+function resumeTimer() {
+    timerState.isPaused = false;
+    timerState.pausedAt = null;
+    document.getElementById('timer-toggle').textContent = 'SKIP';
+    document.querySelector('.timer-label').textContent = 'RESTING';
 }
 
 function stopTimer() {
     clearInterval(timerState.interval);
     timerState.interval = null;
     timerState.isActive = false;
+    timerState.isPaused = false;
     document.getElementById('rest-timer-overlay').classList.add('hidden');
+    document.getElementById('timer-toggle').textContent = 'SKIP';
+    document.querySelector('.timer-label').textContent = 'RESTING';
 }
 
 function adjustTimer(seconds) {
@@ -72,13 +113,15 @@ function notifyTimerEnd() {
     if ('vibrate' in navigator) {
         navigator.vibrate([200, 100, 200]);
     }
-    // Optional: play a subtle beep
+    // Optional: play a subtle beep or notification sound
 }
 
 // Auto-trigger timer when an exercise is checked
 function handleExerciseChecked() {
-    // Only start if not already active or if user prefers auto-timer
-    startTimer(90);
+    // Only start if not already active
+    if (!timerState.isActive) {
+        startTimer(90);
+    }
 }
 
 // Export for use in app.js
