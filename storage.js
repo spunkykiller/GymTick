@@ -384,7 +384,10 @@ const StorageExports = {
     saveExerciseHistory,
     // NEW: Streak & stats functions
     calculateWorkoutStreak,
-    getQuickStats
+    getQuickStats,
+    // NEW: Consistency & badges
+    getWeeklyConsistency,
+    getAchievementBadges
 };
 
 if (typeof window !== 'undefined') {
@@ -393,4 +396,118 @@ if (typeof window !== 'undefined') {
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = StorageExports;
+}
+// NEW: Calculate weekly consistency percentage
+function getWeeklyConsistency() {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const logs = getWorkoutLogs();
+    const schedule = getSchedule();
+    const templates = getTemplates();
+
+    let scheduledWorkouts = 0;
+    let completedWorkouts = 0;
+
+    // Count scheduled workouts this week
+    for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+
+        if (day > now) break; // Don't count future days
+
+        const dayIdx = day.getDay();
+        const templateId = schedule[dayIdx];
+
+        if (templateId && templates[templateId] && templates[templateId].id !== 'rest') {
+            scheduledWorkouts++;
+
+            // Check if completed
+            const dateString = day.toDateString();
+            if (logs.some(log => log.dateString === dateString)) {
+                completedWorkouts++;
+            }
+        }
+    }
+
+    return scheduledWorkouts > 0 ? Math.round((completedWorkouts / scheduledWorkouts) * 100) : 100;
+}
+
+// NEW: Get achievement badges
+function getAchievementBadges() {
+    const logs = getWorkoutLogs();
+    const totalWorkouts = logs.length;
+    const currentStreak = calculateWorkoutStreak();
+
+    const badges = [];
+
+    // First Workout
+    if (totalWorkouts >= 1) {
+        badges.push({
+            id: 'first_workout',
+            name: 'First Step',
+            icon: '🎯',
+            description: 'Completed your first workout',
+            earned: true
+        });
+    }
+
+    // 7-Day Streak
+    if (currentStreak >= 7) {
+        badges.push({
+            id: 'week_streak',
+            name: 'Week Warrior',
+            icon: '🔥',
+            description: '7 days in a row',
+            earned: true
+        });
+    }
+
+    // 30-Day Streak
+    if (currentStreak >= 30) {
+        badges.push({
+            id: 'month_streak',
+            name: 'Monthly Master',
+            icon: '💎',
+            description: '30 days in a row',
+            earned: true
+        });
+    }
+
+    // 100 Workouts
+    if (totalWorkouts >= 100) {
+        badges.push({
+            id: 'century',
+            name: 'Century Club',
+            icon: '💯',
+            description: '100 total workouts',
+            earned: true
+        });
+    }
+
+    // 10 Workouts
+    if (totalWorkouts >= 10) {
+        badges.push({
+            id: 'ten_workouts',
+            name: 'Getting Started',
+            icon: '⭐',
+            description: '10 total workouts',
+            earned: true
+        });
+    }
+
+    // 50 Workouts
+    if (totalWorkouts >= 50) {
+        badges.push({
+            id: 'fifty_workouts',
+            name: 'Halfway Hero',
+            icon: '🌟',
+            description: '50 total workouts',
+            earned: true
+        });
+    }
+
+    return badges;
 }

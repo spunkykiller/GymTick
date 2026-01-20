@@ -512,6 +512,12 @@ function updateStatsDisplay(logs) {
     document.getElementById('stats-monthly-sessions').textContent = stats.monthlyWorkouts;
     document.getElementById('stats-current-streak').textContent = stats.currentStreak;
     document.getElementById('stats-consistent-day').textContent = stats.mostConsistentDay;
+
+    // NEW: Update consistency
+    updateConsistencyDisplay();
+
+    // NEW: Update badges
+    updateBadgesDisplay();
 }
 
 // ==================== EDITOR VIEW (New) ====================
@@ -641,4 +647,50 @@ function updateStreakDisplay() {
     } else {
         streakBadge.classList.add('hidden');
     }
+}
+// NEW: Update consistency display
+function updateConsistencyDisplay() {
+    const percentage = getWeeklyConsistency();
+    const bar = document.getElementById('consistency-bar');
+    const text = document.getElementById('consistency-percentage');
+
+    bar.style.width = `${percentage}%`;
+    text.textContent = `${percentage}%`;
+
+    // Color based on percentage
+    if (percentage >= 80) {
+        bar.style.background = 'linear-gradient(90deg, var(--success), #34D399)';
+    } else if (percentage >= 50) {
+        bar.style.background = 'linear-gradient(90deg, var(--accent-primary), var(--accent-hover))';
+    } else {
+        bar.style.background = 'linear-gradient(90deg, #EF4444, #F87171)';
+    }
+}
+
+// NEW: Update badges display
+function updateBadgesDisplay() {
+    const badges = getAchievementBadges();
+    const container = document.getElementById('badges-container');
+    const noBadges = document.getElementById('no-badges');
+
+    if (badges.length === 0) {
+        container.classList.add('hidden');
+        noBadges.classList.remove('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    noBadges.classList.add('hidden');
+    container.innerHTML = '';
+
+    badges.forEach(badge => {
+        const badgeEl = document.createElement('div');
+        badgeEl.className = 'badge-card';
+        badgeEl.innerHTML = `
+            <div class="badge-icon">${badge.icon}</div>
+            <div class="badge-name">${badge.name}</div>
+            <div class="badge-description">${badge.description}</div>
+        `;
+        container.appendChild(badgeEl);
+    });
 }
