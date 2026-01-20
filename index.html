@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1C1917">
+  <meta name="description"
+    content="GymTick - Ultra-simple workout completion tracking. Zero friction, offline-first gym to-do list.">
+
+  <!-- PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GymTick">
+
+  <title>GymTick - Workout Tracker</title>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- TODAY VIEW -->
+  <div id="today-view" class="view active">
+    <div class="container">
+      <header class="text-center mb-lg">
+        <div class="header-top">
+          <h1 id="today-workout-name">Loading...</h1>
+          <div id="sync-status" class="sync-status offline" title="Cloud Sync Status">
+            <span class="sync-dot"></span>
+            <span class="sync-label">Offline</span>
+          </div>
+        </div>
+        <p id="today-date" class="text-secondary"></p>
+      </header>
+
+      <!-- Rest Day Message -->
+      <div id="rest-day-container" class="rest-day-message hidden">
+        <div class="rest-day-emoji">😴</div>
+        <h2 class="rest-day-title">Rest Day</h2>
+        <p class="rest-day-subtitle">Recovery is part of the process. Enjoy your day off!</p>
+      </div>
+
+      <!-- Workout Container -->
+      <div id="workout-container">
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+          <p class="progress-text" id="progress-text">0/0 completed</p>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Exercise Checklist -->
+        <ul class="exercise-list" id="exercise-list">
+          <!-- Exercises will be dynamically inserted here -->
+        </ul>
+
+        <!-- Complete Workout Button -->
+        <button id="complete-btn" class="btn btn-primary btn-block" disabled>
+          Complete Workout
+        </button>
+
+        <hr class="view-divider">
+
+        <!-- Weekly Schedule Section (Moved from Schedule View) -->
+        <section class="weekly-schedule-section mt-lg">
+          <h2 class="section-title">Weekly Plan</h2>
+          <div id="schedule-container">
+            <!-- Schedule will be dynamically inserted here -->
+          </div>
+        </section>
+
+
+
+        <!-- Auth & Profile Section (New) -->
+        <section class="auth-section mt-lg">
+          <div id="auth-logged-out" class="card text-center">
+            <h3 class="mb-sm">Cloud Backup</h3>
+            <p class="text-secondary small mb-md">Login with Google to sync your workouts across all your devices.</p>
+            <button id="login-google-btn" class="btn btn-primary btn-block">
+              <span class="btn-icon">G</span> Login with Google
+            </button>
+          </div>
+
+          <div id="auth-logged-in" class="card hidden">
+            <div class="profile-header">
+              <img id="user-avatar" class="user-avatar" src="" alt="Profile">
+              <div class="profile-info">
+                <div id="user-name" class="user-name">User Name</div>
+                <div id="user-email" class="user-email text-secondary small">user@example.com</div>
+              </div>
+              <button id="logout-btn" class="btn-delete" title="Logout">Logout</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="history-view" class="view">
+    <div class="container">
+      <header class="text-center mb-lg">
+        <h1>Workout History</h1>
+      </header>
+
+      <!-- Analytics Dashboard (New) -->
+      <section class="analytics-section mb-lg">
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div class="analytics-value" id="stats-total-sessions">0</div>
+            <div class="analytics-label">Total Sessions</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-value" id="stats-monthly-progress">0%</div>
+            <div class="analytics-label">Consistency</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-value" id="stats-missed-workouts">0</div>
+            <div class="analytics-label">Missed</div>
+          </div>
+        </div>
+      </section>
+
+      <ul class="history-list" id="history-list">
+        <!-- History items will be dynamically inserted here -->
+      </ul>
+
+      <div id="empty-history" class="empty-state hidden">
+        <p>No workouts logged yet. Complete your first workout to see it here!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR VIEW (New) -->
+  <div id="editor-view" class="view">
+    <div class="container">
+      <header class="text-center mb-lg">
+        <h1>Plan Editor</h1>
+        <p class="text-secondary">Customize your weekly workout routines</p>
+      </header>
+
+      <div id="editor-container">
+        <!-- Editor items will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <a class="nav-item active" data-view="today" id="nav-today">
+      <span class="nav-icon">✓</span>
+      <span class="nav-label">Today</span>
+    </a>
+    <a class="nav-item" data-view="history" id="nav-history">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">History</span>
+    </a>
+    <a class="nav-item" data-view="editor" id="nav-editor">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Editor</span>
+    </a>
+  </nav>
+
+  <!-- SUCCESS OVERLAY (Hidden by default) -->
+  <div id="success-overlay" class="success-overlay hidden">
+    <div class="success-content">
+      <div class="success-emoji">🎉</div>
+      <h2 class="success-title">Workout Complete!</h2>
+      <p class="success-message">Great job! Keep up the momentum.</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="data.js"></script>
+  <script src="config.js"></script>
+  <script src="storage.js"></script>
+  <script src="supabase.js"></script>
+  <script src="timer.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => {
+            console.log('Service Worker registered');
+
+            // Tech Upgrade: Handle updates
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  if (confirm('New technical features available! Reload now?')) {
+                    newWorker.postMessage('SKIP_WAITING');
+                  }
+                }
+              });
+            });
+          })
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+
+      let refreshing;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        window.location.reload();
+        refreshing = true;
+      });
+    }
+  </script>
+</body>
+
+</html>

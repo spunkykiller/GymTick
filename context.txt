@@ -1,0 +1,706 @@
+
+Antigravity Project Prompt
+
+Project name: GymTick
+Type: Mobile-first web app (PWA)
+Goal: Ultra-simple workout completion tracking app (tick-based, no heavy logging)
+
+
+---
+
+Product Vision
+
+Build a minimal, fast, distraction-free gym workout logging app.
+
+The app should behave like:
+
+> Open → See today’s workout → Tick exercises → Workout logged → Close app
+
+
+
+No typing during workouts.
+No complex analytics.
+No social features.
+No clutter.
+
+This is a “to-do list for the gym”.
+
+
+---
+
+Target User
+
+People who:
+
+Already have a workout routine
+
+Want to track completion
+
+Hate complex fitness apps
+
+Want speed and simplicity in the gym
+
+
+
+---
+
+Core UX Principles
+
+One-screen primary flow
+
+Large buttons
+
+Thumb-friendly
+
+Dark mode by default
+
+Offline-first
+
+Zero friction
+
+No forced login
+
+
+
+---
+
+Main Features (MVP)
+
+1. Workout Schedule System
+
+Preload this weekly routine:
+
+Monday – Legs
+
+Warmup: Cycling (10 minutes)
+
+Stretching
+
+Leg curls
+
+Leg extensions
+
+Burpees – 15 x 3
+
+
+Tuesday – Chest + Triceps
+
+Chest workout
+
+Triceps workout
+
+
+Wednesday – Chest + Triceps
+
+Inclined flyes (2.5kg dumbbells)
+
+Chest press
+
+Declined chest press
+
+Tricep close bar pulldown
+
+Tricep overhead extension
+
+
+Thursday – Shoulders
+
+Side raises (4 sets)
+
+Shoulder dumbbell overhead press
+
+Isolated press
+
+Shrugs
+
+
+Friday – Cardio + Back + Biceps
+
+Cycling – 10 min
+
+Treadmill – 20 min
+
+Walker – 20 min
+
+Assisted pull-ups
+
+Biceps
+
+Dumbbell curls
+
+Barbell curls
+
+
+Saturday – Chest (variation)
+
+Incline dumbbell flyes
+
+Chest press
+
+Flat bench press
+
+
+Sunday – Rest day
+
+
+---
+
+App Screens
+
+1. Today Screen (Primary)
+
+Automatically detect day and show:
+
+Workout name
+
+Exercise checklist
+
+Progress indicator (e.g. 3/7 completed)
+
+
+Each exercise has:
+
+Checkbox
+
+Exercise name
+
+Optional notes (small text)
+
+
+At bottom:
+
+[ COMPLETE WORKOUT ] button
+
+When pressed:
+
+Save workout log
+
+Store timestamp
+
+Show success animation
+
+Reset for next day
+
+
+
+---
+
+2. History Screen
+
+Simple list:
+
+Date
+
+Workout name
+
+Completed / Missed
+
+
+Calendar view optional.
+
+
+---
+
+3. Schedule Editor (Simple)
+
+Allow:
+
+Editing workout names
+
+Editing exercise lists
+
+Reordering exercises
+
+Assigning workouts to days
+
+
+No advanced metrics.
+
+
+---
+
+Data Model
+
+Entities:
+
+WorkoutTemplate
+
+id
+
+name
+
+exercises[]
+
+
+Schedule
+
+day → workoutTemplateId
+
+
+WorkoutLog
+
+date
+
+workoutTemplateId
+
+completedExercises[]
+
+completedAt
+
+
+
+Use local storage / SQLite.
+
+Cloud sync optional later.
+
+
+---
+
+UI Design Requirements
+
+Style:
+
+Minimal
+
+Black / dark gray background
+
+High contrast white text
+
+Accent color: green for completed
+
+Big typography
+
+Large tap targets
+
+No ads
+
+No clutter
+
+
+Layout:
+
+Single-column
+Card-based
+Sticky bottom button
+
+
+---
+
+Technical Requirements
+
+Mobile-first responsive
+
+Works offline
+
+Instant load (<1 second)
+
+PWA installable
+
+Local database
+
+No account required
+
+
+
+---
+
+Navigation
+
+Bottom tab bar:
+
+Today
+
+History
+
+Schedule
+
+
+
+---
+
+Behavior Rules
+
+Automatically detect current weekday
+
+Show rest day message on Sunday
+
+Prevent accidental completion (confirm dialog)
+
+Persist partial progress if app closes
+
+Auto-save after every tick
+
+
+
+---
+
+Out of Scope (Do NOT build)
+
+Nutrition tracking
+
+Calories
+
+Social features
+
+Messaging
+
+AI coaching
+
+Exercise videos
+
+Payment systems
+
+Ads
+
+
+
+---
+
+Success Criteria
+
+User can:
+
+Open app
+
+Tick exercises in under 5 seconds
+
+Close app
+
+See workout logged
+
+
+
+---
+
+Optional Enhancements (only if easy)
+
+Streak counter
+
+Vibration feedback on completion
+
+Simple statistics (workouts/week)
+
+Home screen widget
+
+Great idea. You’re basically describing “frictionless workout completion tracking” — not planning, not analytics-heavy coaching, just execute → tick → move on. That’s exactly where Notion and most fitness apps fail.
+
+Below is a curated, product-thinking breakdown you can directly use to design your platform.
+
+
+---
+
+1. Why existing tools fail (Notion & fitness apps)
+
+Notion problems
+
+❌ Too many clicks (open workspace → database → filter → edit row → save)
+
+❌ Not designed for “in-the-gym” usage (small buttons, typing required)
+
+❌ Manual structure setup
+
+❌ Slow to load
+
+❌ No offline reliability
+
+❌ Feels like work, not training
+
+
+Fitness app problems
+
+❌ Overloaded with features (macros, social, videos, coaching, AI)
+
+❌ Too many decisions during workout
+
+❌ Logging sets/reps/weight is tedious
+
+❌ Requires constant interaction
+
+❌ Pushes notifications & upsells
+
+❌ Bad UX for “just confirm I did it”
+
+
+
+---
+
+2. Your product philosophy (core principle)
+
+> Zero cognitive load. One tap. Continue training.
+
+
+
+Your app should feel like:
+
+> “Open → See today → Tap done → Close”
+
+
+
+No typing. No scrolling. No thinking.
+
+
+---
+
+3. Core user flow (perfect minimal flow)
+
+Before gym (setup – rare)
+
+User creates:
+
+Weekly schedule (Push / Pull / Legs)
+
+Or specific workouts (Chest Day, Back Day, etc.)
+
+
+Assigns days
+
+
+At gym (main experience – daily)
+
+1. Open app
+
+
+2. Automatically shows:
+
+> “Today: Push Day”
+
+
+
+
+3. Big button: ✅ Start
+
+
+4. Shows workout checklist:
+
+Bench Press
+
+Incline DB Press
+
+Triceps Pushdown
+
+
+
+5. User taps checkbox after each exercise
+
+
+6. When last item checked: 🎉 “Workout complete”
+
+
+7. Auto-log timestamp
+
+
+8. App closes
+
+
+
+
+---
+
+4. Common friction points to eliminate
+
+Problem	Your solution
+
+Typing during workout	No typing
+Tracking sets/reps	Optional / hidden
+Multiple screens	Single screen
+Complex dashboards	No dashboards
+Social features	None
+Notifications	Only optional reminders
+Editing plans often	Simple templates
+Internet dependency	Offline first
+
+
+
+---
+
+5. Feature set (MVP)
+
+Must have
+
+Workout templates
+
+Weekly schedule
+
+Today view
+
+Exercise checklist
+
+Auto log completion
+
+History (calendar or list)
+
+Offline support
+
+Fast startup (<1s)
+
+
+Nice later
+
+Streak counter
+
+Weight tracking (optional)
+
+Simple stats (workouts/week)
+
+Dark mode
+
+Apple Watch / Wear OS
+
+
+Avoid initially
+
+Social
+
+Macros
+
+Videos
+
+AI coaching
+
+Marketplaces
+
+Messaging
+
+
+
+---
+
+6. UI layout (single-screen concept)
+
+--------------------------------
+| Today: Push Day              |
+| Monday, Jan 13               |
+--------------------------------
+
+[ ] Bench Press
+[ ] Incline Dumbbell Press
+[ ] Shoulder Press
+[ ] Triceps Pushdown
+
+-------------------------------
+|      COMPLETE WORKOUT       |
+-------------------------------
+
+When all checked → auto logs.
+
+
+---
+
+7. Data model (simple)
+
+User
+WorkoutTemplate
+  - name
+  - exercises[]
+
+Schedule
+  - day → workoutTemplateId
+
+WorkoutLog
+  - date
+  - workoutTemplateId
+  - completedExercises[]
+  - completedAt
+
+
+---
+
+8. Differentiation statement
+
+Your app is:
+
+> “Todo list for the gym.”
+
+
+
+Not:
+
+Trainer
+
+Coach
+
+Social network
+
+Spreadsheet
+
+
+
+---
+
+9. Name ideas
+
+TickLift
+
+DoneGym
+
+RepDone
+
+GymTick
+
+LiftLog (minimal version)
+
+CheckFit
+
+SetDone
+
+
+
+---
+
+10. Validation strategy (before building)
+
+Ask 10 gym-goers:
+
+> “Would you use an app that only shows today’s workout and lets you tick it off in 10 seconds?”
+
+
+
+If 7+ say yes → build.
+
+
+---
+
+11. Tech suggestion (optional)
+
+Stack
+
+Frontend: React Native / Flutter
+
+Storage: Local SQLite
+
+Sync later: Firebase/Supabase
+
+Offline-first
+
+
+
+---
+
+12. Expansion ideas (future)
+
+Wearable one-tap logging
+
+Gym NFC check-in auto complete
+
+Voice “Workout done”
+
+Automatic rest timer
+
+Program templates marketplace
+
+
+
+---
+
+If you want, I can also provide:
+
+Wireframes
+
+Feature prioritization roadmap
+
+Monetization ideas
+
+Technical architecture diagram
+
+Or help define MVP in 1-week build plan
+

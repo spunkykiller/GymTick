@@ -1,0 +1,26 @@
+{
+  "name": "GymTick",
+  "short_name": "GymTick",
+  "description": "Ultra-simple workout completion tracking. Zero friction, offline-first gym to-do list.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1C1917",
+  "background_color": "#1C1917",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "screenshots": []
+}
