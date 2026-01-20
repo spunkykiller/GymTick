@@ -52,14 +52,35 @@ function updateAuthUI(user) {
 
 const SyncService = {
     async signInWithGoogle() {
-        if (!supabaseClient) return;
-        const { error } = await supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin
+        console.log('signInWithGoogle called');
+        console.log('supabaseClient:', supabaseClient);
+        console.log('SUPABASE_URL:', SUPABASE_URL);
+        console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'Present' : 'Missing');
+
+        if (!supabaseClient) {
+            console.error('Supabase client not initialized!');
+            alert('Supabase not configured. Please check config.js');
+            return;
+        }
+
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+
+            console.log('OAuth response:', { data, error });
+
+            if (error) {
+                console.error('Error signing in:', error);
+                alert(`Login error: ${error.message}`);
             }
-        });
-        if (error) console.error('Error signing in:', error.message);
+        } catch (err) {
+            console.error('Exception during sign in:', err);
+            alert(`Login failed: ${err.message}`);
+        }
     },
 
     async signOut() {
