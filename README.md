@@ -1,108 +1,101 @@
-# GymTick 💪
+# 🏋️ GymTick - Workout Tracker PWA
 
 > Ultra-simple workout completion tracking. Zero friction, offline-first gym to-do list.
 
-## Overview
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/spunkykiller/GymTick)
 
-GymTick is a mobile-first Progressive Web App (PWA) designed for people who already have a workout routine and just want to track completion without the complexity of traditional fitness apps.
+## ✨ Features
 
-**Philosophy:** "Open → See today's workout → Tick exercises → Workout logged → Close app"
+- **✓ One-Tap Tracking** - Check off exercises as you complete them
+- **📱 Mobile-First PWA** - Install on your phone, works offline
+- **☁️ Cloud Sync** - Login with Google to sync across devices
+- **📊 Progress Tracking** - See your workout history and consistency
+- **⚡ Lightning Fast** - Loads in under 1 second
+- **🎨 Clean UI** - Dark mode, minimal design, zero clutter
 
-## Features
+## 🚀 Live Demo
 
-✅ **Automatic Day Detection** - Shows today's workout based on your weekly schedule  
-✅ **One-Tap Exercise Tracking** - Large, thumb-friendly checkboxes  
-✅ **Auto-Save** - Progress saved after every tick  
-✅ **Offline-First** - Works completely without internet  
-✅ **PWA Installable** - Add to home screen on mobile/desktop  
-✅ **Premium Dark Mode** - Beautiful, distraction-free design  
-✅ **Zero Typing** - No input required during workouts  
-✅ **Workout History** - See all completed workouts with timestamps  
-✅ **Weekly Schedule** - View your full workout plan  
+**[Try GymTick Now](https://gymtick.vercel.app)** _(Update this URL after deployment)_
 
-## Quick Start
+## 🛠️ Tech Stack
 
-1. Open `index.html` in your browser
-2. Install as PWA (optional but recommended)
-3. Start tracking your workouts!
+- **Frontend**: Vanilla JavaScript, HTML5, CSS3
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **Hosting**: Vercel
+- **PWA**: Service Worker, Web App Manifest
 
-### Installation
+## 📦 Quick Start
 
-**Mobile (iOS/Android):**
-- Safari (iOS): Tap Share → Add to Home Screen
-- Chrome (Android): Tap Menu → Add to Home Screen
+### Local Development
 
-**Desktop:**
-- Chrome/Edge: Click install icon in address bar
+```bash
+# Clone the repository
+git clone https://github.com/spunkykiller/GymTick.git
+cd GymTick
 
-## Default Weekly Schedule
+# Install dependencies
+npm install
 
-- **Monday:** Legs (Cycling, Stretching, Leg curls, Leg extensions, Burpees)
-- **Tuesday:** Chest + Triceps
-- **Wednesday:** Chest + Triceps (variation)
-- **Thursday:** Shoulders
-- **Friday:** Cardio + Back + Biceps
-- **Saturday:** Chest (variation)
-- **Sunday:** Rest Day
-
-## Tech Stack
-
-- **Frontend:** Vanilla HTML, CSS, JavaScript
-- **Storage:** localStorage
-- **Fonts:** Manrope (headings), Inter (body)
-- **PWA:** Service Worker for offline support
-- **Design:** Premium dark mode inspired by modern web aesthetics
-
-## File Structure
-
-```
-GYM App/
-├── index.html           # Main HTML structure
-├── styles.css           # Premium dark mode design system
-├── app.js              # Application logic
-├── data.js             # Workout data model
-├── storage.js          # localStorage wrapper
-├── manifest.json       # PWA configuration
-├── service-worker.js   # Offline caching
-└── icons/              # App icons (192x192, 512x512)
+# Start local server
+npx http-server -p 3000
 ```
 
-## Design Principles
+Visit `http://localhost:3000`
 
-- **Zero Cognitive Load** - No decisions during workouts
-- **One-Screen Flow** - Everything accessible without scrolling
-- **Large Tap Targets** - Minimum 48x48px for all interactive elements
-- **High Contrast** - WCAG AA compliant text
-- **Smooth Animations** - Micro-interactions for delight
-- **Mobile-First** - Optimized for portrait orientation
+### Deploy to Vercel
 
-## Performance
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
 
-- **Load Time:** <1 second
-- **Bundle Size:** Minimal (no framework dependencies)
-- **Offline:** 100% functional without internet
-- **Lighthouse Score:** Performance 95+, PWA 100
+## 🔧 Configuration
 
-## Browser Support
+### Environment Variables
 
-- Chrome/Edge (recommended)
-- Safari (iOS/macOS)
-- Firefox
-- Any modern browser with PWA support
+Create a `config.js` file (or set in Vercel):
 
-## Future Enhancements
+```javascript
+window.ENV_CONFIG = {
+  SUPABASE_URL: "your-supabase-url",
+  SUPABASE_ANON_KEY: "your-anon-key"
+};
+```
 
-- Streak counter
-- Simple statistics (workouts/week)
-- Exercise notes
-- Rest timer
-- Export data (CSV)
-- Cloud sync (Firebase/Supabase)
+### Database Setup
 
-## License
+Run the SQL migration in your Supabase dashboard:
+```bash
+node run-migration.js
+```
 
-Free to use and modify for personal use.
+Or manually execute `supabase_migration.sql` in the SQL Editor.
+
+## 📱 Install as PWA
+
+1. Open the app in Chrome/Safari
+2. Click "Add to Home Screen"
+3. Launch from your home screen like a native app
+
+## 🎯 Usage
+
+1. **View Today's Workout** - Automatically shows your scheduled routine
+2. **Check Off Exercises** - Tap to mark complete
+3. **Track Sets** - Log weight and reps for each set
+4. **Complete Workout** - Save your progress
+5. **View History** - See past workouts and stats
+
+## 🔐 Privacy & Security
+
+- **Row Level Security** - Users can only see their own data
+- **Google OAuth** - Secure authentication via Supabase
+- **No Tracking** - Zero analytics or third-party scripts
+
+## 📄 License
+
+MIT License - feel free to use for personal or commercial projects
+
+## 🤝 Contributing
+
+Contributions welcome! Feel free to open issues or submit PRs.
 
 ---
 
-**Built with ❤️ for gym-goers who value simplicity over complexity.**
+Made with 💪 by [spunkykiller](https://github.com/spunkykiller)
