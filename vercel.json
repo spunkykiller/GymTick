@@ -1,6 +1,3 @@
 {
-    "version": 2,
-    "buildCommand": "node generate-config.js",
-    "publishDir": ".",
-    "installCommand": "npm install"
+    "buildCommand": "node generate-config.js"
 }
