@@ -460,8 +460,8 @@ function loadHistoryView() {
     emptyState.classList.add('hidden');
     historyList.innerHTML = '';
 
-    // Tech Upgrade: Calculate and show analytics
-    updateAnalytics(logs);
+    // NEW: Enhanced stats dashboard
+    updateStatsDisplay(logs);
 
     // Sort logs by date (newest first)
     const sortedLogs = logs.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -504,46 +504,14 @@ function loadHistoryView() {
     });
 }
 
-function updateAnalytics(logs) {
-    const totalSessions = logs.length;
+// NEW: Enhanced stats display
+function updateStatsDisplay(logs) {
+    const stats = getQuickStats();
 
-    // Calculate consistency for the current month
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    const monthlyLogs = logs.filter(log => {
-        const logDate = new Date(log.date);
-        return logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear;
-    });
-
-    const sessionsThisMonth = monthlyLogs.length;
-
-    // Total scheduled sessions this month so far
-    const totalDaysSoFar = now.getDate();
-    let scheduledWorkoutsSoFar = 0;
-    const schedule = getSchedule();
-    const templates = getTemplates();
-
-    for (let i = 1; i <= totalDaysSoFar; i++) {
-        const d = new Date(currentYear, currentMonth, i);
-        const dayIdx = d.getDay();
-        const templateId = schedule[dayIdx];
-        if (templateId && templates[templateId] && templates[templateId].id !== 'rest') {
-            scheduledWorkoutsSoFar++;
-        }
-    }
-
-    const consistency = scheduledWorkoutsSoFar > 0
-        ? Math.round((sessionsThisMonth / scheduledWorkoutsSoFar) * 100)
-        : 100;
-
-    const missed = Math.max(0, scheduledWorkoutsSoFar - sessionsThisMonth);
-
-    // Update UI
-    document.getElementById('stats-total-sessions').textContent = totalSessions;
-    document.getElementById('stats-monthly-progress').textContent = `${consistency}%`;
-    document.getElementById('stats-missed-workouts').textContent = missed;
+    document.getElementById('stats-total-sessions').textContent = stats.totalWorkouts;
+    document.getElementById('stats-monthly-sessions').textContent = stats.monthlyWorkouts;
+    document.getElementById('stats-current-streak').textContent = stats.currentStreak;
+    document.getElementById('stats-consistent-day').textContent = stats.mostConsistentDay;
 }
 
 // ==================== EDITOR VIEW (New) ====================

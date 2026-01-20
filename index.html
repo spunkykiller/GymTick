@@ -127,20 +127,29 @@
         <h1>Workout History</h1>
       </header>
 
-      <!-- Analytics Dashboard (New) -->
+      <!-- Enhanced Analytics Dashboard -->
       <section class="analytics-section mb-lg">
+        <h2 class="section-title mb-md">Your Stats</h2>
         <div class="analytics-grid">
           <div class="analytics-card">
+            <div class="analytics-icon">💪</div>
             <div class="analytics-value" id="stats-total-sessions">0</div>
-            <div class="analytics-label">Total Sessions</div>
+            <div class="analytics-label">Total Workouts</div>
           </div>
           <div class="analytics-card">
-            <div class="analytics-value" id="stats-monthly-progress">0%</div>
-            <div class="analytics-label">Consistency</div>
+            <div class="analytics-icon">📅</div>
+            <div class="analytics-value" id="stats-monthly-sessions">0</div>
+            <div class="analytics-label">This Month</div>
+          </div>
+          <div class="analytics-card highlight">
+            <div class="analytics-icon">🔥</div>
+            <div class="analytics-value" id="stats-current-streak">0</div>
+            <div class="analytics-label">Day Streak</div>
           </div>
           <div class="analytics-card">
-            <div class="analytics-value" id="stats-missed-workouts">0</div>
-            <div class="analytics-label">Missed</div>
+            <div class="analytics-icon">⭐</div>
+            <div class="analytics-value" id="stats-consistent-day">-</div>
+            <div class="analytics-label">Best Day</div>
           </div>
         </div>
       </section>
