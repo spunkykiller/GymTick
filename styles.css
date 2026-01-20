@@ -2031,3 +2031,210 @@ small {
         justify-content: center;
     }
 }
+/* ==================== MOBILE RESPONSIVE LAYOUT ==================== */
+
+/* Ensure viewport is set correctly */
+@viewport {
+    width: device-width;
+    zoom: 1.0;
+}
+
+/* Base mobile optimizations */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+
+    body {
+        padding-bottom: 90px;
+        /* More space for nav on mobile */
+    }
+
+    .container {
+        padding: var(--spacing-md);
+    }
+
+    /* Header adjustments */
+    .header-top {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .header-top h1 {
+        font-size: 1.5rem;
+    }
+
+    .header-badges {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    /* Make all cards stack */
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    /* Exercise cards */
+    .exercise-card {
+        padding: var(--spacing-md);
+    }
+
+    .exercise-name {
+        font-size: 1rem;
+    }
+
+    /* Set inputs */
+    .set-input-field {
+        width: 60px;
+        font-size: 0.875rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        width: 100%;
+        padding: var(--spacing-md);
+    }
+
+    /* Modal */
+    .modal-content {
+        margin: var(--spacing-md);
+        max-height: 90vh;
+    }
+
+    /* Editor view fixes */
+    .editor-template-card {
+        padding: var(--spacing-md);
+    }
+
+    .editor-exercise-input {
+        font-size: 0.875rem;
+    }
+
+    .editor-sets-control {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Navigation */
+    .bottom-nav {
+        padding: var(--spacing-sm);
+    }
+
+    .nav-item {
+        min-width: 60px;
+    }
+
+    .nav-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Small phones */
+@media (max-width: 375px) {
+    html {
+        font-size: 13px;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-badges {
+        width: 100%;
+    }
+
+    .streak-badge,
+    .auth-container,
+    .sync-status {
+        font-size: 0.75rem;
+    }
+
+    .login-text {
+        display: none;
+    }
+
+    .btn-login {
+        padding: 0.5rem;
+        min-width: 40px;
+    }
+}
+
+/* Landscape mode */
+@media (max-width: 768px) and (orientation: landscape) {
+    body {
+        padding-bottom: 70px;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+    }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .analytics-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .container {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    .container {
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
+    .analytics-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Larger touch targets */
+    .exercise-checkbox {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .btn-voice-note,
+    .btn-quick-add,
+    .btn-logout {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Remove hover effects on touch */
+    .exercise-card:hover {
+        transform: none;
+    }
+
+    .analytics-card:hover {
+        transform: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border-subtle: #78716C;
+        --border-medium: #A8A29E;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
