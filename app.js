@@ -372,9 +372,33 @@ function updateProgress() {
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     // Complete Workout Button
-    const completeBtn = document.getElementById('complete-btn'); // Changed from 'complete-workout-btn' to 'complete-btn' to match existing ID
+    const completeBtn = document.getElementById('complete-btn');
     if (completeBtn) {
         completeBtn.onclick = handleCompleteWorkout;
+    }
+
+    // Auth buttons
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    if (loginBtn) {
+        loginBtn.onclick = async () => {
+            console.log('Login button clicked');
+            if (window.SyncService) {
+                await window.SyncService.signInWithGoogle();
+            } else {
+                console.error('SyncService not available');
+            }
+        };
+    }
+
+    if (logoutBtn) {
+        logoutBtn.onclick = async () => {
+            console.log('Logout button clicked');
+            if (window.SyncService) {
+                await window.SyncService.signOut();
+            }
+        };
     }
 
     // Tech Feature: Data Portability
