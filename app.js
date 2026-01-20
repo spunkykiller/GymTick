@@ -119,6 +119,9 @@ function loadTodayView() {
     renderExercises();
     updateProgress();
 
+    // NEW: Update streak counter
+    updateStreakDisplay();
+
     // Render Weekly Plan (Horizontal Schedule)
     renderHorizontalSchedule();
 }
@@ -188,9 +191,20 @@ function renderExercises() {
         const setNum = exercise.sets || 1;
         const lastStats = getLastStats(exercise.id);
 
+        // NEW: Get last session data for progressive overload
+        const lastSession = getLastExerciseSession(exercise.id);
         let lastTimeHtml = '';
-        if (lastStats) {
-            // Find weight/reps for first set as a summary or show range
+
+        if (lastSession) {
+            const suggestion = suggestProgression(lastSession.weight, lastSession.reps);
+            lastTimeHtml = `
+                <div class="exercise-last-time">
+                    Last: ${lastSession.weight}kg × ${lastSession.reps} reps
+                    <span class="progression-hint">${suggestion.message}</span>
+                </div>
+            `;
+        } else if (lastStats) {
+            // Fallback to old stats display
             const w = lastStats[`${exercise.id}-set-1-weight`];
             const r = lastStats[`${exercise.id}-set-1-reps`];
             if (w || r) {
@@ -645,4 +659,18 @@ function startManualWorkout(workoutId) {
 function formatDate(date) {
     const options = { weekday: 'long', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
+}
+// NEW: Update streak display
+function updateStreakDisplay() {
+    const streak = calculateWorkoutStreak();
+    const streakBadge = document.getElementById('streak-badge');
+    const streakCount = document.getElementById('streak-count');
+
+    if (streak > 0) {
+        streakBadge.classList.remove('hidden');
+        streakCount.textContent = streak;
+        streakBadge.title = `${streak} day${streak > 1 ? 's' : ''} in a row!`;
+    } else {
+        streakBadge.classList.add('hidden');
+    }
 }

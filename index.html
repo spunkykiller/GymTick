@@ -42,9 +42,15 @@
       <header class="text-center mb-lg">
         <div class="header-top">
           <h1 id="today-workout-name">Loading...</h1>
-          <div id="sync-status" class="sync-status offline" title="Cloud Sync Status">
-            <span class="sync-dot"></span>
-            <span class="sync-label">Offline</span>
+          <div class="header-badges">
+            <div id="streak-badge" class="streak-badge hidden">
+              <span class="streak-emoji">🔥</span>
+              <span id="streak-count" class="streak-count">0</span>
+            </div>
+            <div id="sync-status" class="sync-status offline" title="Cloud Sync Status">
+              <span class="sync-dot"></span>
+              <span class="sync-label">Offline</span>
+            </div>
           </div>
         </div>
         <p id="today-date" class="text-secondary"></p>

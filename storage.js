@@ -1,11 +1,12 @@
-// GymTick - Local Storage Management
-// Handles all data persistence with localStorage
+// GymTick - Enhanced Storage with Progressive Overload & Streaks
+// Handles all data persistence with localStorage + advanced features
 
 const STORAGE_KEYS = {
     SCHEDULE: 'gymtick_schedule',
     WORKOUT_LOGS: 'gymtick_workout_logs',
     CURRENT_PROGRESS: 'gymtick_current_progress',
-    TEMPLATES: 'gymtick_templates'
+    TEMPLATES: 'gymtick_templates',
+    EXERCISE_HISTORY: 'gymtick_exercise_history' // NEW: For progressive overload
 };
 
 // Initialize storage with default data if empty
@@ -24,6 +25,10 @@ function initializeStorage() {
 
     if (!localStorage.getItem(STORAGE_KEYS.CURRENT_PROGRESS)) {
         localStorage.setItem(STORAGE_KEYS.CURRENT_PROGRESS, JSON.stringify({}));
+    }
+
+    if (!localStorage.getItem(STORAGE_KEYS.EXERCISE_HISTORY)) {
+        localStorage.setItem(STORAGE_KEYS.EXERCISE_HISTORY, JSON.stringify([]));
     }
 }
 
@@ -89,6 +94,127 @@ function saveExerciseProgress(id, value) {
     localStorage.setItem(STORAGE_KEYS.CURRENT_PROGRESS, JSON.stringify(allProgress));
 }
 
+// NEW: Save exercise history for progressive overload
+function saveExerciseHistory(exerciseId, setNumber, weight, reps) {
+    const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.EXERCISE_HISTORY) || '[]');
+
+    history.push({
+        exerciseId,
+        setNumber,
+        weight: parseFloat(weight) || 0,
+        reps: parseInt(reps) || 0,
+        volume: (parseFloat(weight) || 0) * (parseInt(reps) || 0),
+        date: new Date().toISOString()
+    });
+
+    localStorage.setItem(STORAGE_KEYS.EXERCISE_HISTORY, JSON.stringify(history));
+}
+
+// NEW: Get last session data for an exercise
+function getLastExerciseSession(exerciseId) {
+    const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.EXERCISE_HISTORY) || '[]');
+    const exerciseHistory = history
+        .filter(h => h.exerciseId === exerciseId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (exerciseHistory.length === 0) return null;
+
+    // Get the most recent session's first set
+    const lastSet = exerciseHistory[0];
+    return {
+        weight: lastSet.weight,
+        reps: lastSet.reps,
+        date: new Date(lastSet.date).toLocaleDateString()
+    };
+}
+
+// NEW: Suggest progressive overload
+function suggestProgression(lastWeight, lastReps) {
+    // Simple progression logic:
+    // If reps >= 12, suggest +2.5kg
+    // If reps < 12, suggest +1 rep
+    if (lastReps >= 12) {
+        return {
+            type: 'weight',
+            suggested: lastWeight + 2.5,
+            message: `+2.5kg (${lastWeight + 2.5}kg)`
+        };
+    } else {
+        return {
+            type: 'reps',
+            suggested: lastReps + 1,
+            message: `+1 rep (${lastReps + 1} reps)`
+        };
+    }
+}
+
+// NEW: Calculate workout streak
+function calculateWorkoutStreak() {
+    const logs = getWorkoutLogs();
+    if (logs.length === 0) return 0;
+
+    // Sort logs by date descending
+    const sortedLogs = logs.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Get unique dates
+    const uniqueDates = [...new Set(sortedLogs.map(log => new Date(log.date).toDateString()))];
+
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < uniqueDates.length; i++) {
+        const logDate = new Date(uniqueDates[i]);
+        logDate.setHours(0, 0, 0, 0);
+
+        const expectedDate = new Date(today);
+        expectedDate.setDate(today.getDate() - i);
+        expectedDate.setHours(0, 0, 0, 0);
+
+        if (logDate.getTime() === expectedDate.getTime()) {
+            streak++;
+        } else {
+            break;
+        }
+    }
+
+    return streak;
+}
+
+// NEW: Get quick stats
+function getQuickStats() {
+    const logs = getWorkoutLogs();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Total workouts this month
+    const monthlyLogs = logs.filter(log => {
+        const logDate = new Date(log.date);
+        return logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear;
+    });
+
+    // Most consistent day of week
+    const dayCount = {};
+    logs.forEach(log => {
+        const day = new Date(log.date).getDay();
+        dayCount[day] = (dayCount[day] || 0) + 1;
+    });
+
+    const mostConsistentDay = Object.keys(dayCount).length > 0
+        ? parseInt(Object.keys(dayCount).reduce((a, b) => dayCount[a] > dayCount[b] ? a : b))
+        : null;
+
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    return {
+        totalWorkouts: logs.length,
+        monthlyWorkouts: monthlyLogs.length,
+        currentStreak: calculateWorkoutStreak(),
+        mostConsistentDay: mostConsistentDay !== null ? dayNames[mostConsistentDay] : 'N/A'
+    };
+}
+
 // Complete workout and log it
 function completeWorkout(workoutTemplateId, completedExercises) {
     const logs = JSON.parse(localStorage.getItem(STORAGE_KEYS.WORKOUT_LOGS) || '[]');
@@ -107,6 +233,31 @@ function completeWorkout(workoutTemplateId, completedExercises) {
 
     logs.push(newLog);
     localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, JSON.stringify(logs));
+
+    // NEW: Save exercise history for progressive overload
+    if (currentDayData.setData) {
+        Object.keys(currentDayData.setData).forEach(key => {
+            const match = key.match(/^(.+)-set-(\d+)-(weight|reps)$/);
+            if (match) {
+                const exerciseId = match[1];
+                const setNumber = parseInt(match[2]);
+                const type = match[3];
+
+                // Only save when we have both weight and reps for a set
+                const weightKey = `${exerciseId}-set-${setNumber}-weight`;
+                const repsKey = `${exerciseId}-set-${setNumber}-reps`;
+
+                if (currentDayData.setData[weightKey] && currentDayData.setData[repsKey]) {
+                    saveExerciseHistory(
+                        exerciseId,
+                        setNumber,
+                        currentDayData.setData[weightKey],
+                        currentDayData.setData[repsKey]
+                    );
+                }
+            }
+        });
+    }
 
     // Tech Upgrade: Sync to Cloud
     if (window.SyncService) {
@@ -226,7 +377,14 @@ const StorageExports = {
             }
         }
         return null;
-    }
+    },
+    // NEW: Progressive overload functions
+    getLastExerciseSession,
+    suggestProgression,
+    saveExerciseHistory,
+    // NEW: Streak & stats functions
+    calculateWorkoutStreak,
+    getQuickStats
 };
 
 if (typeof window !== 'undefined') {
