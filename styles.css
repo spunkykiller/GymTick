@@ -2238,3 +2238,88 @@ small {
         transition-duration: 0.01ms !important;
     }
 }
+/* ==================== PROFILE LOGIN UI ==================== */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.profile-card {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.profile-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-4px);
+    background-color: var(--bg-tertiary);
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    background-color: var(--accent-primary);
+    color: var(--bg-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 auto var(--spacing-md);
+}
+
+.profile-name {
+    font-weight: 700;
+    font-family: var(--font-heading);
+}
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+}
+
+.avatar-sm {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--bg-primary);
+}
+
+.user-name-sm {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.login-form {
+    padding: var(--spacing-md) 0;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+}

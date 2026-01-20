@@ -48,16 +48,15 @@
               <span id="streak-count" class="streak-count">0</span>
             </div>
             <!-- Auth UI -->
-            <div id="auth-logged-out" class="auth-container">
-              <button id="login-btn" class="btn-login">
-                <span class="login-icon">🔐</span>
+            <div id="auth-section" class="auth-container">
+              <button id="profile-login-btn" class="btn-login">
+                <span class="login-icon">👤</span>
                 <span class="login-text">Login</span>
               </button>
-            </div>
-            <div id="auth-logged-in" class="auth-container hidden">
-              <button id="logout-btn" class="btn-logout" title="Logout">
-                <span class="logout-icon">👤</span>
-              </button>
+              <div id="user-profile-badge" class="user-badge hidden">
+                <img id="user-avatar-small" class="avatar-sm" src="" alt="">
+                <span id="user-name-small" class="user-name-sm"></span>
+              </div>
             </div>
             <div id="sync-status" class="sync-status offline" title="Cloud Sync Status">
               <span class="sync-dot"></span>
@@ -113,27 +112,36 @@
 
 
 
-        <!-- Auth & Profile Section (New) -->
-        <section class="auth-section mt-lg">
-          <div id="auth-logged-out" class="card text-center">
-            <h3 class="mb-sm">Cloud Backup</h3>
-            <p class="text-secondary small mb-md">Login with Google to sync your workouts across all your devices.</p>
-            <button id="login-google-btn" class="btn btn-primary btn-block">
-              <span class="btn-icon">G</span> Login with Google
-            </button>
-          </div>
+        <!-- (Old Auth Section Removed) -->
+      </div>
+    </div>
+  </div>
 
-          <div id="auth-logged-in" class="card hidden">
-            <div class="profile-header">
-              <img id="user-avatar" class="user-avatar" src="" alt="Profile">
-              <div class="profile-info">
-                <div id="user-name" class="user-name">User Name</div>
-                <div id="user-email" class="user-email text-secondary small">user@example.com</div>
-              </div>
-              <button id="logout-btn" class="btn-delete" title="Logout">Logout</button>
-            </div>
+  <!-- Profile Login Modal -->
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Choose Profile</h3>
+        <button id="close-login-modal" class="btn-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-grid">
+          <div class="profile-card" onclick="selectProfile('mohit')">
+            <div class="profile-avatar">M</div>
+            <div class="profile-name">Mohit Silla</div>
           </div>
-        </section>
+          <div class="profile-card" onclick="selectProfile('yasaswi')">
+            <div class="profile-avatar">Y</div>
+            <div class="profile-name">Yasaswi</div>
+          </div>
+        </div>
+
+        <div id="login-form" class="login-form hidden">
+          <p id="selected-profile-name" class="text-center mb-sm"></p>
+          <input type="password" id="login-code" class="search-input" placeholder="Enter Code">
+          <button id="submit-login" class="btn btn-primary btn-block mt-md">Login</button>
+          <button id="back-to-profiles" class="btn-text btn-block mt-sm">Back</button>
+        </div>
       </div>
     </div>
   </div>

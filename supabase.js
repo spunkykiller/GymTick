@@ -21,28 +21,30 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 }
 
 function updateAuthUI(user) {
-    const loggedOutView = document.getElementById('auth-logged-out');
-    const loggedInView = document.getElementById('auth-logged-in');
+    const loginBtn = document.getElementById('profile-login-btn');
+    const userBadge = document.getElementById('user-profile-badge');
     const syncStatus = document.getElementById('sync-status');
+    const nameSmall = document.getElementById('user-name-small');
 
     if (user) {
-        if (loggedOutView) loggedOutView.classList.add('hidden');
-        if (loggedInView) loggedInView.classList.remove('hidden');
+        if (loginBtn) loginBtn.classList.add('hidden');
+        if (userBadge) {
+            userBadge.classList.remove('hidden');
+            userBadge.onclick = () => {
+                if (confirm(`Logout from ${user.user_metadata.full_name || user.email}?`)) {
+                    SyncService.signOut();
+                }
+            };
+        }
+        if (nameSmall) nameSmall.textContent = user.user_metadata.full_name || 'User';
+
         if (syncStatus) {
             syncStatus.classList.replace('offline', 'online');
             syncStatus.querySelector('.sync-label').textContent = 'Online';
         }
-
-        const avatar = document.getElementById('user-avatar');
-        const name = document.getElementById('user-name');
-        const email = document.getElementById('user-email');
-
-        if (avatar) avatar.src = user.user_metadata.avatar_url || '';
-        if (name) name.textContent = user.user_metadata.full_name || user.email;
-        if (email) email.textContent = user.email;
     } else {
-        if (loggedOutView) loggedOutView.classList.remove('hidden');
-        if (loggedInView) loggedInView.classList.add('hidden');
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (userBadge) userBadge.classList.add('hidden');
         if (syncStatus) {
             syncStatus.classList.replace('online', 'offline');
             syncStatus.querySelector('.sync-label').textContent = 'Offline';
@@ -51,35 +53,52 @@ function updateAuthUI(user) {
 }
 
 const SyncService = {
-    async signInWithGoogle() {
-        console.log('signInWithGoogle called');
-        console.log('supabaseClient:', supabaseClient);
-        console.log('SUPABASE_URL:', SUPABASE_URL);
-        console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'Present' : 'Missing');
+    async signInWithCode(profile, code) {
+        if (!supabaseClient) return;
 
-        if (!supabaseClient) {
-            console.error('Supabase client not initialized!');
-            alert('Supabase not configured. Please check config.js');
-            return;
-        }
+        const email = profile === 'mohit' ? 'mohit@gymtick.app' : 'yasaswi@gymtick.app';
+        const fullName = profile === 'mohit' ? 'Mohit Silla' : 'Yasaswi';
 
         try {
-            const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
-                }
+            // Try to sign in
+            let { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: code
             });
 
-            console.log('OAuth response:', { data, error });
+            // If user doesn't exist, sign them up (auto-provisioning for these two users)
+            if (error && error.message.includes('Invalid login credentials')) {
+                console.log('User not found, attempting auto-signup...');
+                const signup = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: code,
+                    options: {
+                        data: {
+                            full_name: fullName
+                        }
+                    }
+                });
 
-            if (error) {
-                console.error('Error signing in:', error);
-                alert(`Login error: ${error.message}`);
+                if (signup.error) throw signup.error;
+
+                // If signup successful, sign in again (or signup might auto-sign in depending on config)
+                if (signup.data.user) {
+                    ({ data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: code
+                    }));
+                }
             }
+
+            if (error) throw error;
+
+            showToast(`Welcome back, ${fullName}!`);
+            return { data, error: null };
+
         } catch (err) {
-            console.error('Exception during sign in:', err);
+            console.error('Login error:', err.message);
             alert(`Login failed: ${err.message}`);
+            return { data: null, error: err };
         }
     },
 
@@ -87,7 +106,10 @@ const SyncService = {
         if (!supabaseClient) return;
         const { error } = await supabaseClient.auth.signOut();
         if (error) console.error('Error signing out:', error.message);
-        else window.location.reload(); // Reset state
+        else {
+            localStorage.clear(); // Clear local data on logout for privacy between profiles
+            window.location.reload();
+        }
     },
 
     async syncWorkoutLog(log) {

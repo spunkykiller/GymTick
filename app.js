@@ -369,6 +369,73 @@ function updateProgress() {
     }
 }
 
+// ==================== PROFILE LOGIN UI ====================
+let selectedProfile = null;
+
+function setupProfileLogin() {
+    const loginBtn = document.getElementById('profile-login-btn');
+    const modal = document.getElementById('login-modal');
+    const closeBtn = document.getElementById('close-login-modal');
+    const backBtn = document.getElementById('back-to-profiles');
+    const submitBtn = document.getElementById('submit-login');
+    const codeInput = document.getElementById('login-code');
+
+    if (loginBtn) {
+        loginBtn.onclick = () => modal.classList.remove('hidden');
+    }
+
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            modal.classList.add('hidden');
+            resetLoginModal();
+        };
+    }
+
+    if (backBtn) {
+        backBtn.onclick = () => resetLoginModal();
+    }
+
+    if (submitBtn) {
+        submitBtn.onclick = async () => {
+            const code = codeInput.value.trim();
+            if (!code) return alert('Please enter your code');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+
+            const { data, error } = await SyncService.signInWithCode(selectedProfile, code);
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Login';
+
+            if (!error) {
+                modal.classList.add('hidden');
+                resetLoginModal();
+            }
+        };
+    }
+
+    // Support Enter key
+    codeInput.onkeypress = (e) => {
+        if (e.key === 'Enter') submitBtn.click();
+    };
+}
+
+function selectProfile(profile) {
+    selectedProfile = profile;
+    document.querySelector('.profile-grid').classList.add('hidden');
+    document.getElementById('login-form').classList.remove('hidden');
+    document.getElementById('selected-profile-name').textContent = `Profile: ${profile === 'mohit' ? 'Mohit Silla' : 'Yasaswi'}`;
+    document.getElementById('login-code').focus();
+}
+
+function resetLoginModal() {
+    selectedProfile = null;
+    document.querySelector('.profile-grid').classList.remove('hidden');
+    document.getElementById('login-form').classList.add('hidden');
+    document.getElementById('login-code').value = '';
+}
+
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     // Complete Workout Button
@@ -377,65 +444,13 @@ function setupEventListeners() {
         completeBtn.onclick = handleCompleteWorkout;
     }
 
-    // Auth buttons
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
+    // Profile Login Init
+    setupProfileLogin();
 
-    if (loginBtn) {
-        loginBtn.onclick = async () => {
-            console.log('Login button clicked');
-            if (window.SyncService) {
-                await window.SyncService.signInWithGoogle();
-            } else {
-                console.error('SyncService not available');
-            }
-        };
-    }
-
-    if (logoutBtn) {
-        logoutBtn.onclick = async () => {
-            console.log('Logout button clicked');
-            if (window.SyncService) {
-                await window.SyncService.signOut();
-            }
-        };
-    }
-
-    // Tech Feature: Data Portability
+    // Export/Import (Legacy support or hidden)
     const exportBtn = document.getElementById('export-btn');
     if (exportBtn) {
         exportBtn.onclick = exportData;
-    }
-
-    const importInput = document.getElementById('import-input');
-    if (importInput) {
-        importInput.onchange = (e) => {
-            if (e.target.files.length > 0) {
-                importData(e.target.files[0]).then(() => {
-                    alert('Data imported successfully! The app will reload.');
-                    window.location.reload();
-                }).catch(err => {
-                    alert('Import failed: ' + err);
-                });
-            }
-        };
-    }
-
-    // Auth Event Listeners
-    const loginBtn = document.getElementById('login-google-btn');
-    if (loginBtn) {
-        loginBtn.onclick = () => {
-            if (window.SyncService) window.SyncService.signInWithGoogle();
-        };
-    }
-
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.onclick = () => {
-            if (window.SyncService && confirm('Sign out of your account?')) {
-                window.SyncService.signOut();
-            }
-        };
     }
 }
 
@@ -798,12 +813,42 @@ function populateExercisePicker(searchQuery = '') {
         item.className = 'exercise-picker-item';
         item.innerHTML = `
             <div class="exercise-picker-name">${exercise.name}</div>
-            <div class="exercise-picker-sets">${exercise.sets} sets</div>
+            <button class="btn-quick-add-sm" onclick="addExerciseToWorkout('${exercise.id}')">Add</button>
         `;
-        item.onclick = () => addExerciseToWorkout(exercise);
         exerciseList.appendChild(item);
     });
 }
+
+function addExerciseToWorkout(exerciseId) {
+    const templates = getTemplates();
+    let exerciseToAdd = null;
+
+    // Find exercise details
+    Object.values(templates).forEach(template => {
+        const found = template.exercises.find(ex => ex.id === exerciseId);
+        if (found) exerciseToAdd = { ...found };
+    });
+
+    if (exerciseToAdd) {
+        currentWorkout.exercises.push({
+            ...exerciseToAdd,
+            id: `added-${Date.now()}` // Unique ID for this session
+        });
+
+        renderExercises();
+        updateProgress();
+        showToast('Exercise added!');
+        document.getElementById('quick-add-modal').classList.add('hidden');
+    }
+}
+
+// NEW: Expose Profile Login functions globally
+window.selectProfile = selectProfile;
+window.updateExerciseName = updateExerciseName;
+window.updateExerciseSets = updateExerciseSets;
+window.deleteExercise = deleteExercise;
+window.addExerciseToTemplate = addExerciseToTemplate;
+window.startManualWorkout = startManualWorkout;
 
 function addExerciseToWorkout(exercise) {
     // Add to current workout
