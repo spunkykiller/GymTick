@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     setupEventListeners();
     setupQuickAdd(); // NEW: Quick add exercise
+    setupVoiceNotes(); // NEW: Voice notes
 });
 
 // ==================== NAVIGATION ====================
@@ -806,4 +807,112 @@ function showToast(message) {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
     }, 2000);
+}
+// NEW: Voice Notes functionality
+let mediaRecorder = null;
+let audioChunks = [];
+let currentRecordingExercise = null;
+
+function setupVoiceNotes() {
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-voice-note')) {
+            const btn = e.target.closest('.btn-voice-note');
+            const exerciseId = btn.dataset.exerciseId;
+
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                stopRecording();
+            } else {
+                startRecording(exerciseId, btn);
+            }
+        }
+    });
+}
+
+async function startRecording(exerciseId, btn) {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        currentRecordingExercise = exerciseId;
+
+        mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            await saveVoiceNote(currentRecordingExercise, audioBlob);
+
+            // Stop all tracks
+            stream.getTracks().forEach(track => track.stop());
+
+            // Reset UI
+            btn.classList.remove('recording');
+            btn.querySelector('.voice-icon').textContent = '🎤';
+
+            showToast('Voice note saved!');
+        };
+
+        mediaRecorder.start();
+
+        // Update UI
+        btn.classList.add('recording');
+        btn.querySelector('.voice-icon').textContent = '⏺️';
+
+        showToast('Recording... Tap again to stop');
+
+    } catch (error) {
+        console.error('Error accessing microphone:', error);
+        alert('Could not access microphone. Please grant permission.');
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+    }
+}
+
+async function saveVoiceNote(exerciseId, audioBlob) {
+    // Convert blob to base64
+    const reader = new FileReader();
+    reader.readAsDataURL(audioBlob);
+
+    reader.onloadend = async () => {
+        const base64Audio = reader.result;
+
+        // Save to localStorage
+        const notes = JSON.parse(localStorage.getItem('gymtick_voice_notes') || '{}');
+        if (!notes[exerciseId]) {
+            notes[exerciseId] = [];
+        }
+
+        notes[exerciseId].push({
+            audio: base64Audio,
+            timestamp: new Date().toISOString(),
+            duration: audioBlob.size
+        });
+
+        localStorage.setItem('gymtick_voice_notes', JSON.stringify(notes));
+
+        // TODO: Sync to Supabase exercise_notes table
+        if (window.SyncService && window.SyncService.isAuthenticated()) {
+            try {
+                await window.SyncService.saveExerciseNote({
+                    exercise_id: exerciseId,
+                    note_type: 'voice',
+                    voice_url: base64Audio,
+                    content: 'Voice note'
+                });
+            } catch (error) {
+                console.error('Failed to sync voice note:', error);
+            }
+        }
+    };
+}
+
+// Play voice note
+function playVoiceNote(base64Audio) {
+    const audio = new Audio(base64Audio);
+    audio.play();
 }

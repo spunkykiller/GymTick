@@ -1906,3 +1906,62 @@ small {
         font-size: 0.75rem;
     }
 }
+/* ==================== VOICE NOTES ==================== */
+
+.exercise-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.exercise-checkbox-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.btn-voice-note {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+.btn-voice-note:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.btn-voice-note.recording {
+    background-color: #EF4444;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.voice-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.btn-voice-note.recording .voice-icon {
+    filter: brightness(2);
+}
