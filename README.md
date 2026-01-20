@@ -15,7 +15,9 @@
 
 ## 🚀 Live Demo
 
-**[Try GymTick Now](https://gymtick.vercel.app)** _(Update this URL after deployment)_
+**[Try GymTick Now →](https://gym-tick.vercel.app/)**
+
+Experience the app live! Works on mobile, tablet, and desktop. Install as a PWA for the best experience.
 
 ## 🛠️ Tech Stack
 
