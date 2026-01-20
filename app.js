@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTodayView();
     setupNavigation();
     setupEventListeners();
+    setupQuickAdd(); // NEW: Quick add exercise
 });
 
 // ==================== NAVIGATION ====================
@@ -693,4 +694,116 @@ function updateBadgesDisplay() {
         `;
         container.appendChild(badgeEl);
     });
+}
+// NEW: Quick Add Exercise functionality
+function setupQuickAdd() {
+    const quickAddBtn = document.getElementById('quick-add-btn');
+    const modal = document.getElementById('quick-add-modal');
+    const closeBtn = document.getElementById('close-modal');
+    const searchInput = document.getElementById('exercise-search');
+    const exerciseList = document.getElementById('exercise-list');
+
+    quickAddBtn.onclick = () => {
+        modal.classList.remove('hidden');
+        populateExercisePicker();
+        searchInput.focus();
+    };
+
+    closeBtn.onclick = () => {
+        modal.classList.add('hidden');
+        searchInput.value = '';
+    };
+
+    // Close on outside click
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            searchInput.value = '';
+        }
+    };
+
+    // Search filter
+    searchInput.oninput = () => {
+        const query = searchInput.value.toLowerCase();
+        populateExercisePicker(query);
+    };
+}
+
+function populateExercisePicker(searchQuery = '') {
+    const templates = getTemplates();
+    const exerciseList = document.getElementById('exercise-list');
+    exerciseList.innerHTML = '';
+
+    // Collect all unique exercises from all templates
+    const allExercises = new Set();
+    Object.values(templates).forEach(template => {
+        if (template.exercises) {
+            template.exercises.forEach(ex => {
+                allExercises.add(JSON.stringify({
+                    id: ex.id,
+                    name: ex.name,
+                    sets: ex.sets || 3
+                }));
+            });
+        }
+    });
+
+    // Convert back to array and filter by search
+    const exercises = Array.from(allExercises)
+        .map(str => JSON.parse(str))
+        .filter(ex => ex.name.toLowerCase().includes(searchQuery))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    if (exercises.length === 0) {
+        exerciseList.innerHTML = '<div class="empty-state"><p>No exercises found</p></div>';
+        return;
+    }
+
+    exercises.forEach(exercise => {
+        const item = document.createElement('div');
+        item.className = 'exercise-picker-item';
+        item.innerHTML = `
+            <div class="exercise-picker-name">${exercise.name}</div>
+            <div class="exercise-picker-sets">${exercise.sets} sets</div>
+        `;
+        item.onclick = () => addExerciseToWorkout(exercise);
+        exerciseList.appendChild(item);
+    });
+}
+
+function addExerciseToWorkout(exercise) {
+    // Add to current workout
+    if (!currentWorkout || !currentWorkout.exercises) return;
+
+    // Check if already exists
+    if (currentWorkout.exercises.some(ex => ex.id === exercise.id)) {
+        alert('Exercise already in workout!');
+        return;
+    }
+
+    currentWorkout.exercises.push(exercise);
+
+    // Close modal
+    document.getElementById('quick-add-modal').classList.add('hidden');
+    document.getElementById('exercise-search').value = '';
+
+    // Re-render exercises
+    renderExercises();
+    updateProgress();
+
+    // Show success toast
+    showToast(`Added ${exercise.name} to workout!`);
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }

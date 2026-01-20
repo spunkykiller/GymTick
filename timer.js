@@ -7,8 +7,31 @@ const timerState = {
     interval: null,
     isActive: false,
     isPaused: false,
-    pausedAt: null
+    pausedAt: null,
+    audioEnabled: true // NEW: Audio cues toggle
 };
+
+// NEW: Audio cue system
+const audioContext = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
+
+function playBeep(frequency = 800, duration = 100) {
+    if (!timerState.audioEnabled || !audioContext) return;
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = 'sine';
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration / 1000);
+}
 
 function initTimer() {
     const timerHtml = `
@@ -20,6 +43,12 @@ function initTimer() {
                     <button id="timer-subtract" class="btn-timer">-15s</button>
                     <button id="timer-toggle" class="btn-timer-main">SKIP</button>
                     <button id="timer-add" class="btn-timer">+15s</button>
+                </div>
+                <div class="timer-presets">
+                    <button class="btn-preset" data-seconds="30">30s</button>
+                    <button class="btn-preset" data-seconds="60">60s</button>
+                    <button class="btn-preset" data-seconds="90">90s</button>
+                    <button class="btn-preset" data-seconds="120">120s</button>
                 </div>
             </div>
         </div>
@@ -35,6 +64,14 @@ function initTimer() {
             stopTimer();
         }
     };
+
+    // NEW: Preset buttons
+    document.querySelectorAll('.btn-preset').forEach(btn => {
+        btn.onclick = () => {
+            const seconds = parseInt(btn.dataset.seconds);
+            startTimer(seconds);
+        };
+    });
 
     // Auto-pause when page becomes hidden (user switches apps)
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -65,7 +102,13 @@ function startTimer(seconds = 90) {
             timerState.remaining--;
             updateTimerDisplay();
 
-            if (timerState.remaining <= 0) {
+            // NEW: Audio cues
+            if (timerState.remaining === 10) {
+                playBeep(600, 150); // Low beep at 10s
+            } else if (timerState.remaining === 5) {
+                playBeep(800, 150); // Mid beep at 5s
+            } else if (timerState.remaining === 0) {
+                playBeep(1000, 300); // High beep at 0s
                 stopTimer();
                 notifyTimerEnd();
             }
@@ -113,7 +156,6 @@ function notifyTimerEnd() {
     if ('vibrate' in navigator) {
         navigator.vibrate([200, 100, 200]);
     }
-    // Optional: play a subtle beep or notification sound
 }
 
 // Auto-trigger timer when an exercise is checked
@@ -124,5 +166,10 @@ function handleExerciseChecked() {
     }
 }
 
+// NEW: Toggle audio cues
+function toggleAudio(enabled) {
+    timerState.audioEnabled = enabled;
+}
+
 // Export for use in app.js
-window.GymTimer = { initTimer, startTimer, stopTimer, handleExerciseChecked };
+window.GymTimer = { initTimer, startTimer, stopTimer, handleExerciseChecked, toggleAudio };
