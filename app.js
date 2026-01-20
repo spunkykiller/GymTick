@@ -545,9 +545,14 @@ function loadEditorView() {
 
         const exercisesHtml = workout.exercises.map((ex, exIndex) => `
             <div class="editor-exercise-item">
-                <input type="text" class="editor-exercise-input" 
-                    value="${ex.name}" 
-                    onchange="updateExerciseName('${templateId}', ${exIndex}, this.value)">
+                <div class="editor-exercise-header">
+                    <input type="text" class="editor-exercise-input" 
+                        value="${ex.name}" 
+                        onchange="updateExerciseName('${templateId}', ${exIndex}, this.value)">
+                    <button class="btn-voice-note" data-exercise-id="${ex.id}" title="Voice Note">
+                        <span class="voice-icon">🎤</span>
+                    </button>
+                </div>
                 
                 <div class="editor-sets-control">
                     <span class="editor-sets-label">Sets</span>
