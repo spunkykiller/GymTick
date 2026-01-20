@@ -26,6 +26,8 @@ function updateAuthUI(user) {
     const syncStatus = document.getElementById('sync-status');
     const nameSmall = document.getElementById('user-name-small');
 
+    const greetings = ['today-greeting', 'history-greeting', 'editor-greeting'];
+
     if (user) {
         if (loginBtn) loginBtn.classList.add('hidden');
         if (userBadge) {
@@ -36,7 +38,18 @@ function updateAuthUI(user) {
                 }
             };
         }
-        if (nameSmall) nameSmall.textContent = user.user_metadata.full_name || 'User';
+        const fullName = user.user_metadata.full_name || 'User';
+        const firstName = fullName.split(' ')[0];
+        if (nameSmall) nameSmall.textContent = fullName;
+
+        // Update Greetings
+        greetings.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = `Hey ${firstName}, hope you're having a good day!`;
+                el.classList.remove('hidden');
+            }
+        });
 
         if (syncStatus) {
             syncStatus.classList.replace('offline', 'online');
@@ -45,6 +58,13 @@ function updateAuthUI(user) {
     } else {
         if (loginBtn) loginBtn.classList.remove('hidden');
         if (userBadge) userBadge.classList.add('hidden');
+
+        // Hide Greetings
+        greetings.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+
         if (syncStatus) {
             syncStatus.classList.replace('online', 'offline');
             syncStatus.querySelector('.sync-label').textContent = 'Offline';
@@ -58,6 +78,12 @@ const SyncService = {
 
         const email = profile === 'mohit' ? 'mohit@gymtick.app' : 'yasaswi@gymtick.app';
         const fullName = profile === 'mohit' ? 'Mohit Silla' : 'Yasaswi';
+        const expectedCode = profile === 'mohit' ? '12012004' : '06052004'; // Updated Yasaswi's code
+
+        if (code !== expectedCode) {
+            alert('Invalid code for this profile.');
+            return { data: null, error: 'Invalid code' };
+        }
 
         try {
             // Try to sign in
